@@ -2,18 +2,10 @@ services:
   - type: web
     name: clockinout-backend
     env: node
-    buildCommand: npm install
+    buildCommand: npm install && cd client && npm install && npm run build
     startCommand: node server/index.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 10000
-
-  - type: static
-    name: clockinout-frontend
-    buildCommand: cd client && npm install && npm run build
-    staticPublishPath: ./client/build
-    envVars:
-      - key: REACT_APP_API_URL
-        value: https://clockinout-backend.onrender.com 
+        value: 10000 
