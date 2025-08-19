@@ -13,7 +13,15 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../client/build')));
+const buildPath = path.join(__dirname, '../client/build');
+const indexPath = path.join(buildPath, 'index.html');
+
+// Check if build files exist
+if (require('fs').existsSync(buildPath)) {
+  app.use(express.static(buildPath));
+} else {
+  console.log('Build files not found. Running in API-only mode.');
+}
 
 // Database setup
 const db = new sqlite3.Database('./database.sqlite', (err) => {
@@ -314,7 +322,22 @@ app.get('/api/summary', (req, res) => {
 
 // Handle React routing, return all requests to React app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  if (require('fs').existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.json({ 
+      message: 'Clock In/Out System API is running',
+      status: 'Backend is ready',
+      note: 'Frontend build files not found. Please check the build process.',
+      api_endpoints: [
+        '/api/employees',
+        '/api/clock-in',
+        '/api/clock-out',
+        '/api/today-records',
+        '/api/summary'
+      ]
+    });
+  }
 });
 
 app.listen(PORT, () => {
