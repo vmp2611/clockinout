@@ -2,9 +2,9 @@
 node_modules/
 */node_modules/
 
-# Production builds
-client/build/
-client/dist/
+# Production builds (commented out to include in deployment)
+# client/build/
+# client/dist/
 
 # Environment variables
 .env
