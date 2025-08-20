@@ -325,18 +325,72 @@ app.get('*', (req, res) => {
   if (require('fs').existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
-    res.json({ 
-      message: 'Clock In/Out System API is running',
-      status: 'Backend is ready',
-      note: 'Frontend build files not found. Please check the build process.',
-      api_endpoints: [
-        '/api/employees',
-        '/api/clock-in',
-        '/api/clock-out',
-        '/api/today-records',
-        '/api/summary'
-      ]
-    });
+    // Serve a simple HTML interface when build files are missing
+    const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock In/Out System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        .status { background: #e8f5e8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .api-section { margin: 20px 0; }
+        .endpoint { background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 3px; font-family: monospace; }
+        .test-btn { background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 3px; cursor: pointer; margin-left: 10px; }
+        .test-btn:hover { background: #0056b3; }
+        .result { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕐 Clock In/Out System</h1>
+        
+        <div class="status">
+            <h3>✅ Backend Status</h3>
+            <p><strong>Status:</strong> Running and ready</p>
+            <p><strong>Note:</strong> Frontend build files not found. This is a simple API interface.</p>
+        </div>
+
+        <div class="api-section">
+            <h3>📡 Available API Endpoints</h3>
+            <div class="endpoint">GET /api/employees - Get all employees</div>
+            <div class="endpoint">POST /api/employees - Add new employee</div>
+            <div class="endpoint">POST /api/clock-in - Clock in an employee</div>
+            <div class="endpoint">POST /api/clock-out - Clock out an employee</div>
+            <div class="endpoint">GET /api/today-records - Get today's records</div>
+            <div class="endpoint">GET /api/summary - Get summary statistics</div>
+        </div>
+
+        <div class="api-section">
+            <h3>🧪 Test API</h3>
+            <button class="test-btn" onclick="testAPI('/api/employees')">Test Get Employees</button>
+            <button class="test-btn" onclick="testAPI('/api/summary')">Test Summary</button>
+            <div id="result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI(endpoint) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Loading...';
+            
+            try {
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                resultDiv.innerHTML = '<strong>Response:</strong><br>' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.innerHTML = '<strong>Error:</strong><br>' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>`;
+    
+    res.send(html);
   }
 });
 
